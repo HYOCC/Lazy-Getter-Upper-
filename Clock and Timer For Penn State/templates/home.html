@@ -44,7 +44,7 @@
             height: 100%;
             position: relative;
             display:grid;
-            grid-template-columns: repeat(2, 100px);
+            grid-template-columns: repeat(2, 300px);
             grid-template-rows: repeat(auto-fill);
         }
 
@@ -55,7 +55,7 @@
 
 <body>
     <div class = 'event_list_color', id = 'event_list_color'>
-        
+
     </div>
     <div class = 'event_list', id = 'event_list'>
         <div class = 'event_add'>
@@ -63,21 +63,26 @@
             
             <select id = 'time_options' name = 'time_options'> 
                 <option value = '' disabled selected>Select a time!</option>
-                <option value = '5 mins'>5 minutes</option>
-                <option value = '10 mins'>10 minutes</option>
-                <option value = '15 mins'>15 minutes</option>
-                <option value = '20 mins'>20 minutes</option>
-                <option value = '25 mins'>25 minutes</option>
-                <option value = '30 mins'>30 minutes</option>
-                <option value = '35 mins'>35 minutes</option>
-                <option value = '40 mins'>40 minutes</option>
-                <option value = '45 mins'>45 minutes</option>
-                <option value = '50 mins'>50 minutes</option>
-                <option value = '55 mins'>55 minutes</option>
-                <option value = '60 mins'>60 minutes</option>
+                <option value = '5'>5 minutes</option>
+                <option value = '10'>10 minutes</option>
+                <option value = '15'>15 minutes</option>
+                <option value = '20'>20 minutes</option>
+                <option value = '25'>25 minutes</option>
+                <option value = '30'>30 minutes</option>
+                <option value = '35'>35 minutes</option>
+                <option value = '40'>40 minutes</option>
+                <option value = '45'>45 minutes</option>
+                <option value = '50'>50 minutes</option>
+                <option value = '55'>55 minutes</option>
+                <option value = '60'>60 minutes</option>
             </select>
 
             <button id = 'enter'>Enter</button>
+            
+            <form id = 'time_form' action = '/time_data' method='POST'>
+                <input type = 'hidden'  name = 'time' id = 'time' value = '0'>
+                <input type = 'submit' value = 'submit'> 
+            </form>
         </div>
 
         <div class = 'event_list_label' id = 'event_list_label'> 
@@ -89,6 +94,8 @@
         document.getElementById('enter').addEventListener('click', function() {
             const event_add_text = document.getElementById('event_add_text').value;
             const time_add = document.getElementById('time_options').value;
+            document.getElementById('time').value = (parseInt(document.getElementById('time').value) || 0) + parseInt(time_add);
+
 
             if (event_add_text && time_add) {
                 const new_event_label = document.createElement('label');
