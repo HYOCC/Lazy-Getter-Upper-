@@ -6,19 +6,17 @@
     <title>Blank Website</title>
 </head>
 <body>
-    <h1>FREE ROBUXXXX</h1>
-    <button onclick="getLocation()"> +10000 ROBUX </button>
-    <p id='location_status'></p>
+    <h1>Location Getter</h1>
+    <button onclick="getLocation()"> Submit </button>
     <p id='status'></p>
     <form id = 'myForm' action = '/data' method= 'POST'> 
         <input type = 'hidden' name = 'lat' id = 'lat'>
         <input type = 'hidden' name = 'lon' id = 'lon'>
-    </form>
+    </form>     
     <script>
         //Gets the location of the user 
         function getLocation(){
             const status = document.getElementById('status');
-            const location_status = document.getElementById('location_status');
             const lon = document.getElementById('lon')
             const lat = document.getElementById('lat')
 
@@ -28,7 +26,6 @@
                     (position) => {
                         lon.value = position.coords.longitude;
                         lat.value = position.coords.latitude;
-                        location_status.textContent=`Lat = ${lat.value}, Lon = ${lon.value}`; 
                         document.getElementById('myForm').submit()
                     }
                     , (error) =>{
