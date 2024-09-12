@@ -21,7 +21,6 @@ time = 0
 search_data = ''
 map = ''
 
-api_key = 'AIzaSyBEfwcLaeTTEdXHw1eefzm6i-3oS51e1WY'
 
 g_place_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
 
