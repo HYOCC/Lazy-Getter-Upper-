@@ -13,37 +13,39 @@ from folium import Element
 
 app = Flask(__name__)
 
-user_lat = None
-user_lon = None
-dir_lat = None
-dir_lon = None
-time = 0 
+user_lat, user_lon, dir_lat, dir_lon, dir_name, time = None, None, None, None, None, None
+time_hours, time_minutes = 0, 0
 search_data = ''
 map = ''
+html = None
 
+api_key = 'AIzaSyBEfwcLaeTTEdXHw1eefzm6i-3oS51e1WY'
 
 g_place_url = "https://maps.googleapis.com/maps/api/place/nearbysearch/json"
 
 
 #search function: Create a search bar using html and inject it into the map 
-Search_html = f'''
-<div id="search" style="position: absolute; top: 10px; left: 50px; background-color: white; padding: 10px; border-radius: 5px; z-index: 10000">
-    <form action = '/search_data' method = 'POST'>
-                <input type ='text' id='userInput' name='userInput' placeholder='Search'>
-                <input type = 'Submit' value = 'Submit'>
-    </form>
-    <form action = '/direction_data' method = 'POST'>
-        <input type = 'Submit' value = 'Direction'>
-    </form>
-</div>
-'''
-Search_html = Element(Search_html)
-
+def Search_html(time_display, warning):
+    return f'''
+        <div id="search" style="position: absolute; top: 10px; left: 50px; background-color: rgba(255, 255, 255, 0.0); padding: 10px; border-radius: 5px; z-index: 10000">
+        <form action = '/search_data' method = 'POST'>
+                    <input type ='text' id='userInput' name='userInput' placeholder='Search'>
+                    <input type = 'Submit' value = 'Submit'>
+        </form>
+        <form action = '/direction_data' method = 'POST'>
+            <input type = 'Submit' value = 'Direction'>
+        </form>
+        <div id ='time_label' style='color: red;'>
+            <p><b>Time:{time_display}</b></p>
+            <p><b>{warning}</b></p>
+        </div>
+    </div>
+    '''
 
 #Creates the map base on the area around parameters lat and lon
 #Creates a marker at where the parameters lat and lon is
-def create_map(t_lat, t_lon):
-    global Search_html, map, user_lat, user_lon
+def create_map(t_lat, t_lon, warning = 'none'):
+    global map, user_lat, user_lon, html, time
     user_lat = t_lat 
     user_lon = t_lon
     #creates a variable map which takes from the folium library and creates a map
@@ -52,17 +54,14 @@ def create_map(t_lat, t_lon):
     folium.Marker(location = [t_lat, t_lon], popup = " You", icon = folium.Icon(color='red', icon='flag')).add_to(map)     
     #creates a new file and puts the code of the variable map into it
     
-    map.get_root().html.add_child(Search_html)
-    
+    html = Element(Search_html(time, warning))
+    map.get_root().html.add_child(html)
     map.save("templates/map.html")
 
 def create_marker(lat, lon, name):
-    global Search_html, map
+    global html, map
     #Creates a marker, parameters(location, what will pop up when hovered, icon).add_to(which foilum map variable are we adding this to?)
     folium.Marker(location = [lat, lon], popup = name, icon = folium.Icon(color='blue', icon='flag')).add_to(map)     
-    
-    map.get_root().html.add_child(Search_html)
-    
     map.save("templates/map.html")
     
 def create_direction(waypoints):
@@ -80,7 +79,7 @@ def create_direction(waypoints):
 
 #creates the window (name, file to open)
 def create_map_window():
-    webview.create_window("INteractive Penn State Map", "templates/map.html")
+    webview.create_window("InNteractive Penn State Map", "templates/map.html")
     webview.start()
 
 #Opens a website that gets your exact location then starts a webview, when it closes create_map_window() function is called 
@@ -107,14 +106,16 @@ def access_data():
 
 @app.route('/time_data', methods=['POST'])
 def access_time_data():
-    global time
-    time = request.form.get('time')
+    global time_hours, time_minutes
+    time = int(request.form.get('time'))
+    time_hours = time // 60
+    time_minutes = time % 60
     return render_template('map.html') 
 
 @app.route('/search_data', methods=['POST'])
 def Search():
     try :
-        global search_data, user_lat, user_lon, dir_lat, dir_lon
+        global search_data, user_lat, user_lon, dir_lat, dir_lon, dir_name
         
         create_map(user_lat, user_lon)
         search_data = request.form.get('userInput')
@@ -140,7 +141,7 @@ def Search():
 
 @app.route('/direction_data', methods=['POST'])
 def direction_data():
-    global user_lat, user_lon, dir_lon, dir_lat
+    global user_lat, user_lon, dir_lon, dir_lat, dir_name, html, time
     
     g_direction = 'https://maps.googleapis.com/maps/api/directions/json'
     params = {
@@ -150,9 +151,15 @@ def direction_data():
         'mode': 'walking'
     }
     
-    response = requests.get(g_direction, params=params)
-    data = response.json() 
+    data = requests.get(g_direction, params=params).json() 
     waypoints = [] 
+    time = data['routes'][0]['legs'][0]['duration']['text']
+    warnings = []
+    if 'warnings' in data['routes'][0] and data['routes'][0]['warnings']:
+        for warning in data['routes'][0]['warnings']:
+            warnings.append(warning)
+        ' '.join(warnings)
+
     
     try:
         if 'routes' in data:
@@ -167,9 +174,13 @@ def direction_data():
                     waypoints.append((end_lat, end_lon))
     except:
         pass
+    
+    if warnings:
+        create_map(user_lat, user_lon, warnings)
+    else: create_map(user_lat, user_lon)
+    create_marker(dir_lat, dir_lon, dir_name)
     create_direction(waypoints)
-    print(waypoints)
-    return render_template('map.html') 
+    return render_template('map.html')
 
 if __name__ == '__main__':
     app_thread = threading.Thread(target=start_web)
