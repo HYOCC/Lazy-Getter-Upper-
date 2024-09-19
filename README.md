@@ -1,3 +1,3 @@
-# PSU-INTERACTIVE-MAP
+MAP and CLOCK
 
-When running the program for the first time, a map.html will be created in the templates folder directory. I would suggeste not touching it
+For my lazy bum ass
