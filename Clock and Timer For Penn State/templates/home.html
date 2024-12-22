@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Setup Options</title>
+    <style> 
+        body{
+            background-color: rgb(75, 138, 162);
+            width: 100vw;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .headings{
+            position: absolute;
+            right: 50%;
+            transform:translate(50%,0);
+            font-family: cursive; 
+            font-size: 50px;
+            animation: heading_animations 10s infinite;
+            animation-delay: 2s;
+        }
+
+        @keyframes heading_animations{
+            0%{
+                color:black
+            }
+            50%{
+                color:rgb(17, 181, 246)
+            }
+            100%{
+                color: black;
+            }
+        }
+
+        .events_container{
+            display: flex;
+            flex-direction: column;
+            position: absolute;
+            top: 25%;
+            left: 50%;
+            transform: translate(-50%, 0);
+            background-color: rgb(30, 73, 90);
+            height: calc(100vh - 25%);
+            width: 500px;
+        }
+
+        .events_inputs{
+            display:grid; 
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            grid-auto-rows: minmax(25px, auto); 
+            height: 20px;
+            width: 100%;
+            margin: 10px;
+            gap: 10px;
+            box-sizing: border-box;
+        }
+        .events_buttons, .events_user_inputs{
+            border: 0px;
+            border-radius: 10px;
+            background-color: rgb(135, 206, 235);
+            animation: inputs_animations 3s infinite;
+            font-family: cursive;
+        }
+
+        .events_buttons:hover{
+            cursor:pointer;
+        }
+
+        .events_buttons:hover, .events_user_inputs:hover{
+            animation: inputs_hover .5s forwards;
+        }
+
+        @keyframes inputs_hover{
+            100%{
+                transform: scale(1.2)
+            }
+        }        
+        @keyframes inputs_animations{
+            0%{
+            transform: scale(1);
+            background-color: rgb(135, 206, 235);
+            }
+            50%{
+            transform: scale(1.075);
+            background-color: rgb(15, 249, 249);
+            }
+            100%{
+            transform: scale(1);
+            background-color: rgb(135, 206, 235);
+            }
+        }
+        
+
+        .event_list_label{
+            display: grid;
+            grid-template-columns: 400px 100px;
+            gap: 10px;
+            font-family: cursive;
+        }
+    </style> 
+</head>
+
+<body>
+    <div class = 'headings'>
+        <p>inputs</p>
+    </div>
+    <div class = 'events_container'>
+        <div class = 'events_inputs' id = 'events_inputs'>
+
+            <input type = 'text' id = 'event_add_text' class = 'events_user_inputs hover_enabled' placeholder='ex.brushing teeth'> 
+     
+            <select class = 'events_buttons' id = 'time_options' name = 'time_options'> 
+                <option value = '' disabled selected>Select a time!</option>
+                <option value = '5'>5 minutes</option>
+                <option value = '10'>10 minutes</option>
+                <option value = '15'>15 minutes</option>
+                <option value = '20'>20 minutes</option>
+                <option value = '25'>25 minutes</option>
+                <option value = '30'>30 minutes</option>
+                <option value = '35'>35 minutes</option>
+                <option value = '40'>40 minutes</option>
+                <option value = '45'>45 minutes</option>
+                <option value = '50'>50 minutes</option>
+                <option value = '55'>55 minutes</option>
+                <option value = '60'>60 minutes</option>
+            </select>
+
+            <button class = 'events_buttons' id = 'enter'>Enter</button>
+                    
+            <form id = 'time_form' action = '/time_data' method='POST'>
+                <input type = 'hidden'  name = 'time' id = 'time' value = '0'>
+                <input type = 'submit' class = 'events_buttons' value = 'submit'> 
+            </form>
+
+            <div class = 'event_list_label' id = 'events_list_labels'>
+
+            </div>
+
+        </div>
+    </div>
+    <script>
+        document.getElementById('enter').addEventListener('click', function() {
+            const event_add_text = document.getElementById('event_add_text').value;
+            const time_add = document.getElementById('time_options').value;
+            document.getElementById('time').value = (parseInt(document.getElementById('time').value) || 0) + (parseInt(time_add) || 0);
+
+
+            if (event_add_text && time_add) {
+                const new_event_label = document.createElement('label');
+                const new_time_label = document.createElement('label');
+                new_time_label.textContent = time_add + ' mins';
+                new_event_label.textContent = event_add_text;
+                document.getElementById('events_list_labels').appendChild(new_event_label);
+                document.getElementById('events_list_labels').appendChild(new_time_label);
+                document.getElementById('event_add_text').value= '';
+                document.getElementById('time_options').value = '';
+            }
+        });
+    </script>
+</body>
+</html>
