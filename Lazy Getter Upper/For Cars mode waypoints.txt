@@ -1,0 +1,16 @@
+For Cars mode waypoints
+
+
+road_g_direction = 'https://roads.googleapis.com/v1/snapToRoads'
+    road_params = {'interpolate': 'true', 'key': api_key}
+    road_params['path'] = '|'.join(f'{lat},{lon}' for lat, lon in waypoints)
+    data = requests.get(road_g_direction, params=road_params).json()
+    road_snapped_waypoints = []
+
+    try:
+        if 'snappedPoints' in data:
+            routes = data['snappedPoints']
+            for step in routes:
+                road_snapped_waypoints.append((step['location']['latitude'], step['location']['longitude']))
+    except: 
+        pass
