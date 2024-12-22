@@ -1,8 +1,0 @@
-TO DO FOR MAP
-
-Styling
-
-
-Bugs
-
-AFter calcualted and pressing back, all the progress has beenr eset so if oyu try and press direciton, it turns gives a web bu
